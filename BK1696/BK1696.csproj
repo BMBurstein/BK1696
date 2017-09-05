@@ -90,7 +90,7 @@
     <None Include="Resources\Unlock.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\green-circle-icone-4156.ico" />
+    <Content Include="Resources\source.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
