@@ -25,14 +25,8 @@ namespace BK1696
             ContextMenuStrip = new ContextMenuStrip()
         };
 
-        private SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One)
-        {
-            NewLine = "\r"
-        };
-
         public TrayApplicationContext()
         {
-            port.Open();
             Lock(null, null);
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
@@ -47,7 +41,6 @@ namespace BK1696
         private void Exit_Click(object sender, EventArgs e)
         {
             Unlock(sender, e);
-            port.Close();
             trayIcon.Icon = null;
             ExitThread();
         }
@@ -69,16 +62,30 @@ namespace BK1696
 
         private bool SendCommand(string command)
         {
-            port.WriteLine(command);
-            if (port.ReadLine() == "OK")
+            using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r" })
             {
-                return true;
-            }
-            else
-            {
-                trayIcon.Icon = gray;
-                trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
-                return false;
+                port.Open();
+
+                if (port.IsOpen)
+                {
+                    port.WriteLine(command);
+                    if (port.ReadLine() == "OK")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        trayIcon.Icon = gray;
+                        trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
+                        return false;
+                    }
+                }
+                else
+                {
+                    trayIcon.Icon = gray;
+                    trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
+                    return false;
+                }
             }
         }
 
