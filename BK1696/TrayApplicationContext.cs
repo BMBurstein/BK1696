@@ -25,9 +25,13 @@ namespace BK1696
             ContextMenuStrip = new ContextMenuStrip()
         };
 
+        private AboutForm aboutForm;
+
         public TrayApplicationContext()
         {
             Lock(null, null);
+            trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
+            trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -38,9 +42,24 @@ namespace BK1696
             trayIcon.MouseClick += TrayIcon_MouseClick;
         }
 
+        private void ShowAbout(object sender, EventArgs e)
+        {
+            if (aboutForm == null)
+            {
+                aboutForm = new AboutForm();
+                aboutForm.Show();
+                aboutForm.FormClosed += (o, ev) => { aboutForm = null; };
+            }
+            else
+            {
+                aboutForm.Activate();
+            }
+        }
+
         private void Exit_Click(object sender, EventArgs e)
         {
             Unlock(sender, e);
+            if (aboutForm != null) { aboutForm.Close(); };
             trayIcon.Icon = null;
             ExitThread();
         }
