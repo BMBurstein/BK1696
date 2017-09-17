@@ -79,32 +79,45 @@ namespace BK1696
             }
         }
 
-        private bool SendCommand(string command)
+        private bool SendCommand(string command, bool retry = true)
         {
-            using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r" })
+            try
             {
-                port.Open();
-
-                if (port.IsOpen)
+                using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r", ReadTimeout = 100, WriteTimeout = 100 })
                 {
-                    port.WriteLine(command);
-                    if (port.ReadLine() == "OK")
+                    port.Open();
+
+                    if (port.IsOpen)
                     {
-                        return true;
+                        port.WriteLine(command);
+                        if (port.ReadLine() == "OK")
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            trayIcon.Icon = gray;
+                            trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
+                            return false;
+                        }
                     }
                     else
                     {
                         trayIcon.Icon = gray;
-                        trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
+                        trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
                         return false;
                     }
                 }
-                else
+            }
+            catch(TimeoutException)
+            {
+                if(retry)
                 {
-                    trayIcon.Icon = gray;
-                    trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
-                    return false;
+                    return SendCommand(command, false);
                 }
+                trayIcon.Icon = gray;
+                trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
+                return false;
             }
         }
 
