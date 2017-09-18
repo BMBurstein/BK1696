@@ -30,6 +30,7 @@ namespace BK1696
         public TrayApplicationContext()
         {
             Lock(null, null);
+            ThreadExit += TrayApplicationContext_ThreadExit;
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
@@ -40,6 +41,12 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
+        }
+
+        private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
+        {
+            Unlock(sender, e);
+            trayIcon.Icon = null;
         }
 
         private void ShowAbout(object sender, EventArgs e)
@@ -58,9 +65,7 @@ namespace BK1696
 
         private void Exit_Click(object sender, EventArgs e)
         {
-            Unlock(sender, e);
             if (aboutForm != null) { aboutForm.Close(); };
-            trayIcon.Icon = null;
             ExitThread();
         }
 
