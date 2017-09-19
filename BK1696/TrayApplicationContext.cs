@@ -73,13 +73,13 @@ namespace BK1696
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (trayIcon.Icon == red)
-                {
-                    TurnOn(sender, e);
-                }
-                else if (trayIcon.Icon == green)
+                if (trayIcon.Icon == green)
                 {
                     TurnOff(sender, e);
+                }
+                else
+                {
+                    TurnOn(sender, e);
                 }
             }
         }
