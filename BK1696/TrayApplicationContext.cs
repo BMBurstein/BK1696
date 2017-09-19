@@ -25,12 +25,15 @@ namespace BK1696
             ContextMenuStrip = new ContextMenuStrip()
         };
 
-        private AboutForm aboutForm;
+        private AboutForm about;
 
         public TrayApplicationContext()
         {
             Lock(null, null);
             ThreadExit += TrayApplicationContext_ThreadExit;
+#if DEBUG
+            trayIcon.ContextMenuStrip.Items.Add("DEBUG").Enabled = false;
+#endif
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
@@ -51,21 +54,18 @@ namespace BK1696
 
         private void ShowAbout(object sender, EventArgs e)
         {
-            if (aboutForm == null)
+            if(about == null)
             {
-                aboutForm = new AboutForm();
-                aboutForm.Show();
-                aboutForm.FormClosed += (o, ev) => { aboutForm = null; };
+                about = new AboutForm();
+                about.FormClosed += delegate { about = null; };
+                about.Show();
             }
-            else
-            {
-                aboutForm.Activate();
-            }
+            about.BringToFront();
         }
 
         private void Exit_Click(object sender, EventArgs e)
         {
-            if (aboutForm != null) { aboutForm.Close(); };
+            if (about != null) { about.Close(); };
             ExitThread();
         }
 
