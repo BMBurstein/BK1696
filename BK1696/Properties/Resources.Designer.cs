@@ -65,13 +65,25 @@ namespace BK1696.Properties {
         ///{\colortbl ;\red0\green0\blue255;}
         ///{\*\generator Riched20 10.0.14393}\viewkind4\uc1 
         ///\pard\b\f0\fs32 BK1696 remote control\par
-        ///\b0\fs24 Developed by Baruch Burstein\fs18  ({{\field{\*\fldinst{HYPERLINK https://github.com/BMBurstein/BK1696 }}{\fldrslt{https://github.com/BMBurstein/BK1696\ul0\cf0}}}}\f0\fs18 )\par
+        ///\b0\fs20 &lt;VERSION&gt;\b\fs32\par
+        ///\b0\fs18\par
+        ///\fs24 Developed by Baruch Burstein\fs18  ({{\field{\*\fldinst{HYPERLINK https://github.com/BMBurstein/BK1696 }}{\fldrslt{https://github.com/BMBurstein/BK1696\ul0\cf0}}}}\f0\fs18 )\par
         ///\par
-        ///This program is in no way affiliated with or endorsed by BK Preci [rest of string was truncated]&quot;;.
+        ///This program is in no w [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string about {
             get {
                 return ResourceManager.GetString("about", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Disaster {
+            get {
+                object obj = ResourceManager.GetObject("Disaster", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

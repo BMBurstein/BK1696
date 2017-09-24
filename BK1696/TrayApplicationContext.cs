@@ -34,6 +34,8 @@ namespace BK1696
 #if DEBUG
             trayIcon.ContextMenuStrip.Items.Add("DEBUG").Enabled = false;
 #endif
+            trayIcon.ContextMenuStrip.Items.Add("Set to 12V", Properties.Resources.Disaster, SetVoltage);
+            trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
@@ -146,6 +148,11 @@ namespace BK1696
         private void Unlock(object sender, EventArgs e)
         {
             SendCommand("ENDS00");
+        }
+
+        private void SetVoltage(object sender, EventArgs e)
+        {
+            SendCommand("VOLT00120");
         }
     }
 }
