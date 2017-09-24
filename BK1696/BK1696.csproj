@@ -81,6 +81,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\about.rtf" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Resources\gray.ico" />
   </ItemGroup>
   <ItemGroup>

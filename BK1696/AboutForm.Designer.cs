@@ -28,15 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             this.OK = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.AboutTextBox = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // OK
             // 
             this.OK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.OK.Location = new System.Drawing.Point(285, 132);
+            this.OK.Location = new System.Drawing.Point(388, 209);
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(75, 23);
             this.OK.TabIndex = 0;
@@ -44,14 +43,17 @@
             this.OK.UseVisualStyleBackColor = true;
             this.OK.Click += new System.EventHandler(this.OK_Click);
             // 
-            // label1
+            // AboutTextBox
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(350, 104);
-            this.label1.TabIndex = 1;
-            this.label1.Text = resources.GetString("label1.Text");
+            this.AboutTextBox.BackColor = System.Drawing.SystemColors.Control;
+            this.AboutTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.AboutTextBox.Location = new System.Drawing.Point(12, 12);
+            this.AboutTextBox.Name = "AboutTextBox";
+            this.AboutTextBox.ReadOnly = true;
+            this.AboutTextBox.Size = new System.Drawing.Size(451, 191);
+            this.AboutTextBox.TabIndex = 6;
+            this.AboutTextBox.Text = "";
+            this.AboutTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.AboutTextBox_LinkClicked);
             // 
             // AboutForm
             // 
@@ -59,8 +61,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.OK;
-            this.ClientSize = new System.Drawing.Size(372, 167);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(475, 244);
+            this.Controls.Add(this.AboutTextBox);
             this.Controls.Add(this.OK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -68,15 +70,15 @@
             this.Name = "AboutForm";
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "About BK1696 Control";
+            this.Text = "About BK169x Control";
+            this.Load += new System.EventHandler(this.AboutForm_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.Button OK;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.RichTextBox AboutTextBox;
     }
 }
