@@ -27,6 +27,8 @@ namespace BK1696
 
         private AboutForm about;
 
+        private Timer checkStateTimer = new Timer() { Interval = 1000 };
+
         public TrayApplicationContext()
         {
             Lock(null, null);
@@ -47,7 +49,13 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
 
-            if(GetState())
+            checkStateTimer.Tick += CheckStateTimer_Tick;
+            checkStateTimer.Start();
+        }
+
+        private void CheckStateTimer_Tick(object sender, EventArgs e)
+        {
+            if (GetState())
             {
                 trayIcon.Icon = green;
             }
@@ -169,7 +177,7 @@ namespace BK1696
         private bool GetState()
         {
             string resp = SendCommand("GPAL00");
-            return resp[65] == '0';
+            return resp?[65] == '0';
         }
     }
 }
