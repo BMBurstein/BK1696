@@ -46,6 +46,15 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
+
+            if(GetState())
+            {
+                trayIcon.Icon = green;
+            }
+            else
+            {
+                trayIcon.Icon = red;
+            }
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -86,33 +95,30 @@ namespace BK1696
             }
         }
 
-        private bool SendCommand(string command, bool retry = true)
+        private string SendCommand(string command, bool retry = true)
         {
             try
             {
-                using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r", ReadTimeout = 100, WriteTimeout = 100 })
+                using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r", ReadTimeout = 500, WriteTimeout = 500 })
                 {
                     port.Open();
 
                     if (port.IsOpen)
                     {
                         port.WriteLine(command);
-                        if (port.ReadLine() == "OK")
+                        string resp = port.ReadLine();
+                        if (resp != "OK" && port.ReadLine() != "OK")
                         {
-                            return true;
+                            trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
                         }
                         else
                         {
-                            trayIcon.Icon = gray;
-                            trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
-                            return false;
+                            return resp;
                         }
                     }
                     else
                     {
-                        trayIcon.Icon = gray;
                         trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
-                        return false;
                     }
                 }
             }
@@ -122,37 +128,48 @@ namespace BK1696
                 {
                     return SendCommand(command, false);
                 }
-                trayIcon.Icon = gray;
                 trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
-                return false;
             }
+            trayIcon.Icon = gray;
+            return null;
+        }
+
+        private bool SendSimpleCommand(string command)
+        {
+            return SendCommand(command) == "OK";
         }
 
         private void TurnOff(object sender, EventArgs e)
         {
-            if (SendCommand("SOUT001"))
+            if (SendSimpleCommand("SOUT001"))
                 trayIcon.Icon = red;
         }
 
         private void TurnOn(object sender, EventArgs e)
         {
-            if (SendCommand("SOUT000"))
+            if (SendSimpleCommand("SOUT000"))
                 trayIcon.Icon = green;
         }
 
         private void Lock(object sender, EventArgs e)
         {
-            SendCommand("SESS00");
+            SendSimpleCommand("SESS00");
         }
 
         private void Unlock(object sender, EventArgs e)
         {
-            SendCommand("ENDS00");
+            SendSimpleCommand("ENDS00");
         }
 
         private void SetVoltage(object sender, EventArgs e)
         {
-            SendCommand("VOLT00120");
+            SendSimpleCommand("VOLT00120");
+        }
+
+        private bool GetState()
+        {
+            string resp = SendCommand("GPAL00");
+            return resp[65] == '0';
         }
     }
 }
