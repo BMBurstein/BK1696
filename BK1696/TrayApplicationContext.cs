@@ -103,7 +103,7 @@ namespace BK1696
             }
         }
 
-        private string SendCommand(string command, bool retry = true)
+        private string SendCommand(string command, int retry = 1)
         {
             try
             {
@@ -130,13 +130,20 @@ namespace BK1696
                     }
                 }
             }
-            catch(TimeoutException)
+            catch(Exception ex) when (ex is TimeoutException || ex is UnauthorizedAccessException)
             {
-                if(retry)
+                if (retry > 0)
                 {
-                    return SendCommand(command, false);
+                    return SendCommand(command, retry - 1);
                 }
-                trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
+                if (ex is TimeoutException)
+                {
+                    trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
+                }
+                else
+                {
+                    trayIcon.ShowBalloonTip(3000, "Error", "Could not open port", ToolTipIcon.Error);
+                }
             }
             trayIcon.Icon = gray;
             return null;
