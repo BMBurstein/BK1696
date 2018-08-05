@@ -30,7 +30,7 @@ namespace BK1696
 
         public TrayApplicationContext()
         {
-            var portMenu = new ToolStripMenuItem("COM port");
+            var portMenu = new ToolStripMenuItem("COM port", Properties.Resources.Network_connection);
             ToolStripItem activePort = null;
             foreach (var port in SerialPort.GetPortNames())
             {
