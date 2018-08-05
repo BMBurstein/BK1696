@@ -26,14 +26,33 @@ namespace BK1696
         };
 
         private AboutForm about;
+        private string portName;
 
         public TrayApplicationContext()
         {
-            Lock(null, null);
+            var portMenu = new ToolStripMenuItem("COM port");
+            ToolStripItem activePort = null;
+            foreach (var port in SerialPort.GetPortNames())
+            {
+                var newPort = portMenu.DropDownItems.Add(port, null, SetPort);
+                portName = port;
+                if(SendCommand("SESS00", -1) != null) // lock command
+                {
+                    activePort = newPort;
+                }
+            }
+            if (activePort != null)
+            {
+                SetPort(activePort, null);
+            }
+
+            //Lock(null, null);
             ThreadExit += TrayApplicationContext_ThreadExit;
 #if DEBUG
             trayIcon.ContextMenuStrip.Items.Add("DEBUG").Enabled = false;
 #endif
+
+            trayIcon.ContextMenuStrip.Items.Add(portMenu);
             trayIcon.ContextMenuStrip.Items.Add("Set to 12V", Properties.Resources.Disaster, SetVoltage);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
@@ -99,26 +118,29 @@ namespace BK1696
         {
             try
             {
-                using (SerialPort port = new SerialPort("COM1", 9600, Parity.None, 8, StopBits.One) { NewLine = "\r", ReadTimeout = 500, WriteTimeout = 500 })
+                if (portName != null)
                 {
-                    port.Open();
-
-                    if (port.IsOpen)
+                    using (SerialPort port = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One) { NewLine = "\r", ReadTimeout = 500, WriteTimeout = 500 })
                     {
-                        port.WriteLine(command);
-                        string resp = port.ReadLine();
-                        if (resp != "OK" && port.ReadLine() != "OK")
+                        port.Open();
+
+                        if (port.IsOpen)
                         {
-                            trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
+                            port.WriteLine(command);
+                            string resp = port.ReadLine();
+                            if (resp != "OK" && port.ReadLine() != "OK")
+                            {
+                                trayIcon.ShowBalloonTip(3000, "Error", "Command failed", ToolTipIcon.Error);
+                            }
+                            else
+                            {
+                                return resp;
+                            }
                         }
                         else
                         {
-                            return resp;
+                            trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
                         }
-                    }
-                    else
-                    {
-                        trayIcon.ShowBalloonTip(3000, "Error", "Could not open COM port", ToolTipIcon.Error);
                     }
                 }
             }
@@ -128,13 +150,16 @@ namespace BK1696
                 {
                     return SendCommand(command, retry - 1);
                 }
-                if (ex is TimeoutException)
+                if (retry == 0)
                 {
-                    trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
-                }
-                else
-                {
-                    trayIcon.ShowBalloonTip(3000, "Error", "Could not open port", ToolTipIcon.Error);
+                    if (ex is TimeoutException)
+                    {
+                        trayIcon.ShowBalloonTip(3000, "Error", "Timeout", ToolTipIcon.Error);
+                    }
+                    else
+                    {
+                        trayIcon.ShowBalloonTip(3000, "Error", "Could not open port", ToolTipIcon.Error);
+                    }
                 }
             }
             trayIcon.Icon = gray;
@@ -171,6 +196,19 @@ namespace BK1696
         private void SetVoltage(object sender, EventArgs e)
         {
             SendSimpleCommand("VOLT00120");
+        }
+
+        private void SetPort(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            foreach (ToolStripMenuItem it in ((ToolStripMenuItem)item.OwnerItem).DropDownItems)
+            {
+                if (it == item)
+                    it.Checked = true;
+                else
+                    it.Checked = false;
+            }
+            portName = item.Text;
         }
 
         private bool GetState()
