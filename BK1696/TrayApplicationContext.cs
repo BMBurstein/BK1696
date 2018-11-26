@@ -53,7 +53,9 @@ namespace BK1696
 #endif
 
             trayIcon.ContextMenuStrip.Items.Add(portMenu);
-            trayIcon.ContextMenuStrip.Items.Add("Set to 12V", Properties.Resources.Disaster, SetVoltage);
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster, SetVoltage);
+            trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning, SetCurrent);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -195,7 +197,26 @@ namespace BK1696
 
         private void SetVoltage(object sender, EventArgs e)
         {
-            SendSimpleCommand("VOLT00120");
+            string resp = SendCommand("GETS00");
+            var v = ExtractV(resp);
+            resp = SendCommand("GMAX00");
+            var m = ExtractV(resp);
+            v = NumInputBox.GetVal(NumInputBox.NumInputType.VOLT, v, m);
+            if (v == 0) return;
+            v *= 10;
+            SendSimpleCommand("VOLT00" + v.ToString("000"));
+        }
+
+        private void SetCurrent(object sender, EventArgs e)
+        {
+            string resp = SendCommand("GETS00");
+            var v = ExtractC(resp);
+            resp = SendCommand("GMAX00");
+            var m = ExtractC(resp);
+            v = NumInputBox.GetVal(NumInputBox.NumInputType.CURR, v, m);
+            if (v == 0) return;
+            v *= 100;
+            SendSimpleCommand("CURR00" + v.ToString("000"));
         }
 
         private void SetPort(object sender, EventArgs e)
@@ -215,6 +236,16 @@ namespace BK1696
         {
             string resp = SendCommand("GPAL00");
             return resp?[65] == '0';
+        }
+
+        private decimal ExtractV(string vc)
+        {
+            return decimal.Parse(vc.Substring(0, 3)) / 10;
+        }
+
+        private decimal ExtractC(string vc)
+        {
+            return decimal.Parse(vc.Substring(3, 3)) / 100;
         }
     }
 }
