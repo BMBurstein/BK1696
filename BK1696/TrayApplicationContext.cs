@@ -45,8 +45,7 @@ namespace BK1696
             {
                 SetPort(activePort, null);
             }
-
-            //Lock(null, null);
+            
             ThreadExit += TrayApplicationContext_ThreadExit;
 #if DEBUG
             trayIcon.ContextMenuStrip.Items.Add("DEBUG").Enabled = false;
@@ -57,13 +56,13 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster, SetVoltage);
             trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning, SetCurrent);
             trayIcon.ContextMenuStrip.Items.Add("-");
-            trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
-            trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Turn on", green.ToBitmap(), TurnOn);
             trayIcon.ContextMenuStrip.Items.Add("Turn off", red.ToBitmap(), TurnOff);
+            trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
