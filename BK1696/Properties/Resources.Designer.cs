@@ -61,15 +61,15 @@ namespace BK1696.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset0 Calibri;}}
+        ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Segoe UI;}{\f1\fnil\fcharset0 Calibri;}}
         ///{\colortbl ;\red0\green0\blue255;}
-        ///{\*\generator Riched20 10.0.14393}\viewkind4\uc1 
-        ///\pard\b\f0\fs32 BK1696 remote control\par
+        ///{\*\generator Riched20 10.0.16299}\viewkind4\uc1 
+        ///\pard\nowidctlpar\b\f0\fs32 BK1696 remote control\par
         ///\b0\fs20 &lt;VERSION&gt;\b\fs32\par
         ///\b0\fs18\par
         ///\fs24 Developed by Baruch Burstein\fs18  ({{\field{\*\fldinst{HYPERLINK https://github.com/BMBurstein/BK1696 }}{\fldrslt{https://github.com/BMBurstein/BK1696\ul0\cf0}}}}\f0\fs18 )\par
         ///\par
-        ///This program is in no w [rest of string was truncated]&quot;;.
+        ///Thi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string about {
             get {
@@ -164,6 +164,16 @@ namespace BK1696.Properties {
             get {
                 object obj = ResourceManager.GetObject("red", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Refresh {
+            get {
+                object obj = ResourceManager.GetObject("Refresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

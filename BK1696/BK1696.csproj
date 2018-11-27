@@ -115,6 +115,7 @@
     <None Include="Resources\Disaster.png" />
     <None Include="Resources\Network connection.png" />
     <Content Include="Resources\Lightning.png" />
+    <Content Include="Resources\Refresh.png" />
     <Content Include="Resources\source.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

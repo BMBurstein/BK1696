@@ -21,7 +21,7 @@ namespace BK1696
         {
             Icon = gray,
             Visible = true,
-            Text="BK1696 control",
+            Text = "BK1696 control",
             ContextMenuStrip = new ContextMenuStrip()
         };
 
@@ -36,7 +36,7 @@ namespace BK1696
             {
                 var newPort = portMenu.DropDownItems.Add(port, null, SetPort);
                 portName = port;
-                if(SendCommand("SESS00", -1) != null) // lock command
+                if (SendCommand("SESS00", -1) != null) // lock command
                 {
                     activePort = newPort;
                 }
@@ -45,7 +45,7 @@ namespace BK1696
             {
                 SetPort(activePort, null);
             }
-            
+
             ThreadExit += TrayApplicationContext_ThreadExit;
 #if DEBUG
             trayIcon.ContextMenuStrip.Items.Add("DEBUG").Enabled = false;
@@ -59,6 +59,7 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
             trayIcon.ContextMenuStrip.Items.Add("-");
+            trayIcon.ContextMenuStrip.Items.Add("Refresh icon", Properties.Resources.Refresh, UpdateState);
             trayIcon.ContextMenuStrip.Items.Add("Turn on", green.ToBitmap(), TurnOn);
             trayIcon.ContextMenuStrip.Items.Add("Turn off", red.ToBitmap(), TurnOff);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -67,14 +68,12 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
 
-            if (GetState())
-            {
-                trayIcon.Icon = green;
-            }
-            else
-            {
-                trayIcon.Icon = red;
-            }
+            UpdateState(null, null);
+        }
+
+        private void UpdateState(object sender, EventArgs e)
+        {
+            trayIcon.Icon = GetState() ? green : red;
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -85,7 +84,7 @@ namespace BK1696
 
         private void ShowAbout(object sender, EventArgs e)
         {
-            if(about == null)
+            if (about == null)
             {
                 about = new AboutForm();
                 about.FormClosed += delegate { about = null; };
@@ -145,7 +144,7 @@ namespace BK1696
                     }
                 }
             }
-            catch(Exception ex) when (ex is TimeoutException || ex is UnauthorizedAccessException)
+            catch (Exception ex) when (ex is TimeoutException || ex is UnauthorizedAccessException)
             {
                 if (retry > 0)
                 {
