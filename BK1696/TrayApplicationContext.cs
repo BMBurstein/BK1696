@@ -13,13 +13,9 @@ namespace BK1696
 {
     class TrayApplicationContext : ApplicationContext
     {
-        private static readonly Icon gray = Properties.Resources.gray;
-        private static readonly Icon green = Properties.Resources.green;
-        private static readonly Icon red = Properties.Resources.red;
-
         private NotifyIcon trayIcon = new NotifyIcon()
         {
-            Icon = gray,
+            Icon = Properties.Resources.gray,
             Visible = true,
             Text = "BK1696 control",
             ContextMenuStrip = new ContextMenuStrip()
@@ -53,15 +49,15 @@ namespace BK1696
 
             trayIcon.ContextMenuStrip.Items.Add(portMenu);
             trayIcon.ContextMenuStrip.Items.Add("-");
-            trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster, SetVoltage);
-            trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning, SetCurrent);
+            trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster.ToBitmap(), SetVoltage);
+            trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning.ToBitmap(), SetCurrent);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Refresh icon", Properties.Resources.Refresh, UpdateState);
-            trayIcon.ContextMenuStrip.Items.Add("Turn on", green.ToBitmap(), TurnOn);
-            trayIcon.ContextMenuStrip.Items.Add("Turn off", red.ToBitmap(), TurnOff);
+            trayIcon.ContextMenuStrip.Items.Add("Turn on", Properties.Resources.green.ToBitmap(), TurnOn);
+            trayIcon.ContextMenuStrip.Items.Add("Turn off", Properties.Resources.red.ToBitmap(), TurnOff);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("About", Properties.Resources.Info, ShowAbout);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -73,7 +69,7 @@ namespace BK1696
 
         private void UpdateState(object sender, EventArgs e)
         {
-            trayIcon.Icon = GetState() ? green : red;
+            trayIcon.Icon = GetState() ? Properties.Resources.green : Properties.Resources.red;
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -103,7 +99,7 @@ namespace BK1696
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (trayIcon.Icon == green)
+                if (trayIcon.Icon == Properties.Resources.green)
                 {
                     TurnOff(sender, e);
                 }
@@ -162,7 +158,7 @@ namespace BK1696
                     }
                 }
             }
-            trayIcon.Icon = gray;
+            trayIcon.Icon = Properties.Resources.gray;
             return null;
         }
 
@@ -174,13 +170,13 @@ namespace BK1696
         private void TurnOff(object sender, EventArgs e)
         {
             if (SendSimpleCommand("SOUT001"))
-                trayIcon.Icon = red;
+                trayIcon.Icon = Properties.Resources.red;
         }
 
         private void TurnOn(object sender, EventArgs e)
         {
             if (SendSimpleCommand("SOUT000"))
-                trayIcon.Icon = green;
+                trayIcon.Icon = Properties.Resources.green;
         }
 
         private void Lock(object sender, EventArgs e)

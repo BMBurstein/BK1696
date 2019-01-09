@@ -26,7 +26,7 @@ namespace BK1696
             return box.Val;
         }
 
-        private decimal Val { get; set; }
+        private decimal Val { get; set; } = 0;
 
         public NumInputBox(NumInputType t, decimal init, decimal max)
         {
@@ -34,18 +34,20 @@ namespace BK1696
             switch (t)
             {
                 case NumInputType.VOLT:
-                    Text = "Voltage";
-                    lblUnit.Text = "(V)";
-                    numChooser.Minimum = 1;
-                    numChooser.DecimalPlaces = 1;
-                    numChooser.Increment = decimal.One / 10;
+                    this.Text = "Voltage";
+                    this.lblUnit.Text = "(V)";
+                    this.numChooser.Minimum = 1;
+                    this.numChooser.DecimalPlaces = 1;
+                    this.numChooser.Increment = decimal.One / 10;
+                    this.Icon = Properties.Resources.Disaster;
                     break;
                 case NumInputType.CURR:
-                    Text = "Current";
-                    lblUnit.Text = "(A)";
-                    numChooser.Minimum = decimal.One / 100;
-                    numChooser.DecimalPlaces = 2;
-                    numChooser.Increment = decimal.One / 100;
+                    this.Text = "Current";
+                    this.lblUnit.Text = "(A)";
+                    this.numChooser.Minimum = decimal.One / 100;
+                    this.numChooser.DecimalPlaces = 2;
+                    this.numChooser.Increment = decimal.One / 100;
+                    this.Icon = Properties.Resources.Lightning;
                     break;
             }
             numChooser.Value = init;

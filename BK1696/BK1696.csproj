@@ -112,9 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Info.png" />
-    <None Include="Resources\Disaster.png" />
     <None Include="Resources\Network connection.png" />
-    <Content Include="Resources\Lightning.png" />
+    <Content Include="Resources\Disaster.ico" />
+    <Content Include="Resources\Lightning.ico" />
     <Content Include="Resources\Refresh.png" />
     <Content Include="Resources\source.txt" />
   </ItemGroup>
