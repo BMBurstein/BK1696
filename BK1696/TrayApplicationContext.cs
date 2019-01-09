@@ -23,6 +23,7 @@ namespace BK1696
 
         private AboutForm about;
         private string portName;
+        private bool isOn = false;
 
         public TrayApplicationContext()
         {
@@ -69,7 +70,8 @@ namespace BK1696
 
         private void UpdateState(object sender, EventArgs e)
         {
-            trayIcon.Icon = GetState() ? Properties.Resources.green : Properties.Resources.red;
+            isOn = GetState();
+            trayIcon.Icon = isOn ? Properties.Resources.green : Properties.Resources.red;
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -99,7 +101,7 @@ namespace BK1696
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (trayIcon.Icon == Properties.Resources.green)
+                if (isOn)
                 {
                     TurnOff(sender, e);
                 }
@@ -159,6 +161,7 @@ namespace BK1696
                 }
             }
             trayIcon.Icon = Properties.Resources.gray;
+            isOn = false;
             return null;
         }
 
@@ -169,14 +172,19 @@ namespace BK1696
 
         private void TurnOff(object sender, EventArgs e)
         {
-            if (SendSimpleCommand("SOUT001"))
+            if (SendSimpleCommand("SOUT001")) {
                 trayIcon.Icon = Properties.Resources.red;
+                isOn = false;
+            }
         }
 
         private void TurnOn(object sender, EventArgs e)
         {
             if (SendSimpleCommand("SOUT000"))
+            {
                 trayIcon.Icon = Properties.Resources.green;
+                isOn = true;
+            }
         }
 
         private void Lock(object sender, EventArgs e)
