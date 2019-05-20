@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -24,6 +25,7 @@ namespace BK1696
         private AboutForm about;
         private string portName;
         private bool isOn = false;
+        private ToolStripMenuItem runAtStartup;
 
         public TrayApplicationContext()
         {
@@ -50,6 +52,8 @@ namespace BK1696
 
             trayIcon.ContextMenuStrip.Items.Add(portMenu);
             trayIcon.ContextMenuStrip.Items.Add("-");
+            runAtStartup = (ToolStripMenuItem)trayIcon.ContextMenuStrip.Items.Add("Run at startup", null, SetStartup);
+            trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster.ToBitmap(), SetVoltage);
             trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning.ToBitmap(), SetCurrent);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -68,10 +72,31 @@ namespace BK1696
             UpdateState(null, null);
         }
 
+        private void SetStartup(object sender, EventArgs e)
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true)) {
+                if (runAtStartup.Checked)
+                {
+                    key.DeleteValue(Application.ProductName, false);
+                    runAtStartup.Checked = false;
+                }
+                else
+                {
+                    key.SetValue(Application.ProductName, "\"" + Application.ExecutablePath + "\"");
+                    runAtStartup.Checked = true;
+                }
+            }
+        }
+
         private void UpdateState(object sender, EventArgs e)
         {
             isOn = GetState();
             trayIcon.Icon = isOn ? Properties.Resources.green : Properties.Resources.red;
+
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            {
+                runAtStartup.Checked = key.GetValue(Application.ProductName) != null;
+            }
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -223,7 +248,7 @@ namespace BK1696
 
         private void SetPort(object sender, EventArgs e)
         {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            var item = (ToolStripMenuItem)sender;
             foreach (ToolStripMenuItem it in ((ToolStripMenuItem)item.OwnerItem).DropDownItems)
             {
                 if (it == item)
