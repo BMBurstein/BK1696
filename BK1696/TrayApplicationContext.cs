@@ -25,9 +25,11 @@ namespace BK1696
         private AboutForm about;
         private string portName;
         private bool isOn = false;
+        private bool isError = true;
         private ToolStripMenuItem runAtStartupMenuItem;
         private ToolStripItem setVoltageMenuItem;
         private ToolStripItem setCurrentMenuItem;
+        private bool initDone = false;
 
         public TrayApplicationContext()
         {
@@ -36,16 +38,13 @@ namespace BK1696
             foreach (var port in SerialPort.GetPortNames())
             {
                 var newPort = portMenu.DropDownItems.Add(port, null, SetPort);
-                portName = port;
                 if (SendCommand("SESS00", -1) != null) // lock command
                 {
                     activePort = newPort;
                 }
+                activePort = activePort ?? newPort;
             }
-            if (activePort != null)
-            {
-                SetPort(activePort, null);
-            }
+            SetPort(activePort, null);
 
             ThreadExit += TrayApplicationContext_ThreadExit;
 #if DEBUG
@@ -72,6 +71,7 @@ namespace BK1696
             trayIcon.MouseClick += TrayIcon_MouseClick;
 
             UpdateState(null, null);
+            initDone = true;
         }
 
         private void SetStartup(object sender, EventArgs e)
@@ -92,8 +92,8 @@ namespace BK1696
 
         private void UpdateState(object sender, EventArgs e)
         {
-            isOn = GetState();
-            trayIcon.Icon = isOn ? Properties.Resources.green : Properties.Resources.red;
+            GetState();
+            trayIcon.Icon = isError ? Properties.Resources.gray : (isOn ? Properties.Resources.green : Properties.Resources.red);
 
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
@@ -101,17 +101,20 @@ namespace BK1696
             }
 
             string resp = SendCommand("GETS00");
+            decimal v = 0;
+            decimal c = 0;
             if (resp != null)
             {
-                var v = ExtractV(resp);
-                var c = ExtractC(resp);
-                SetVoltageText(v);
-                SetCurrentText(c);
+                v = ExtractV(resp);
+                c = ExtractC(resp);
             }
+            SetVoltageText(v);
+            SetCurrentText(c);
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
         {
+            initDone = false;
             Unlock(sender, e);
             trayIcon.Icon = null;
         }
@@ -168,6 +171,7 @@ namespace BK1696
                             }
                             else
                             {
+                                isError = false;
                                 return resp;
                             }
                         }
@@ -184,7 +188,7 @@ namespace BK1696
                 {
                     return SendCommand(command, retry - 1);
                 }
-                if (retry == 0)
+                if (retry == 0 && initDone)
                 {
                     if (ex is TimeoutException)
                     {
@@ -198,6 +202,7 @@ namespace BK1696
             }
             trayIcon.Icon = Properties.Resources.gray;
             isOn = false;
+            isError = true;
             return null;
         }
 
@@ -236,6 +241,7 @@ namespace BK1696
         private void SetVoltage(object sender, EventArgs e)
         {
             string resp = SendCommand("GETS00");
+            if (resp == null) return;
             var v = ExtractV(resp);
             resp = SendCommand("GMAX00");
             var m = ExtractV(resp);
@@ -254,6 +260,7 @@ namespace BK1696
         private void SetCurrent(object sender, EventArgs e)
         {
             string resp = SendCommand("GETS00");
+            if (resp == null) return;
             var c = ExtractC(resp);
             resp = SendCommand("GMAX00");
             var m = ExtractC(resp);
@@ -282,10 +289,10 @@ namespace BK1696
             portName = item.Text;
         }
 
-        private bool GetState()
+        private void GetState()
         {
             string resp = SendCommand("GPAL00");
-            return resp?[65] == '0';
+            isOn = resp?[65] == '0';
         }
 
         private decimal ExtractV(string vc)
