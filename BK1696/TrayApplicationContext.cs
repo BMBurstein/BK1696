@@ -25,7 +25,9 @@ namespace BK1696
         private AboutForm about;
         private string portName;
         private bool isOn = false;
-        private ToolStripMenuItem runAtStartup;
+        private ToolStripMenuItem runAtStartupMenuItem;
+        private ToolStripItem setVoltageMenuItem;
+        private ToolStripItem setCurrentMenuItem;
 
         public TrayApplicationContext()
         {
@@ -52,15 +54,15 @@ namespace BK1696
 
             trayIcon.ContextMenuStrip.Items.Add(portMenu);
             trayIcon.ContextMenuStrip.Items.Add("-");
-            runAtStartup = (ToolStripMenuItem)trayIcon.ContextMenuStrip.Items.Add("Run at startup", null, SetStartup);
+            runAtStartupMenuItem = (ToolStripMenuItem)trayIcon.ContextMenuStrip.Items.Add("Run at startup", null, SetStartup);
             trayIcon.ContextMenuStrip.Items.Add("-");
-            trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster.ToBitmap(), SetVoltage);
-            trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning.ToBitmap(), SetCurrent);
+            setVoltageMenuItem = trayIcon.ContextMenuStrip.Items.Add("Set voltage", Properties.Resources.Disaster.ToBitmap(), SetVoltage);
+            setCurrentMenuItem = trayIcon.ContextMenuStrip.Items.Add("Set current", Properties.Resources.Lightning.ToBitmap(), SetCurrent);
             trayIcon.ContextMenuStrip.Items.Add("-");
             trayIcon.ContextMenuStrip.Items.Add("Lock", Properties.Resources.Lock, Lock);
             trayIcon.ContextMenuStrip.Items.Add("Unlock", Properties.Resources.Unlock, Unlock);
             trayIcon.ContextMenuStrip.Items.Add("-");
-            trayIcon.ContextMenuStrip.Items.Add("Refresh icon", Properties.Resources.Refresh, UpdateState);
+            trayIcon.ContextMenuStrip.Items.Add("Refresh status", Properties.Resources.Refresh, UpdateState);
             trayIcon.ContextMenuStrip.Items.Add("Turn on", Properties.Resources.green.ToBitmap(), TurnOn);
             trayIcon.ContextMenuStrip.Items.Add("Turn off", Properties.Resources.red.ToBitmap(), TurnOff);
             trayIcon.ContextMenuStrip.Items.Add("-");
@@ -75,15 +77,15 @@ namespace BK1696
         private void SetStartup(object sender, EventArgs e)
         {
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true)) {
-                if (runAtStartup.Checked)
+                if (runAtStartupMenuItem.Checked)
                 {
                     key.DeleteValue(Application.ProductName, false);
-                    runAtStartup.Checked = false;
+                    runAtStartupMenuItem.Checked = false;
                 }
                 else
                 {
                     key.SetValue(Application.ProductName, "\"" + Application.ExecutablePath + "\"");
-                    runAtStartup.Checked = true;
+                    runAtStartupMenuItem.Checked = true;
                 }
             }
         }
@@ -95,8 +97,14 @@ namespace BK1696
 
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
-                runAtStartup.Checked = key.GetValue(Application.ProductName) != null;
+                runAtStartupMenuItem.Checked = key.GetValue(Application.ProductName) != null;
             }
+
+            string resp = SendCommand("GETS00");
+            var v = ExtractV(resp);
+            var c = ExtractC(resp);
+            SetVoltageText(v);
+            SetCurrentText(c);
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
@@ -230,20 +238,32 @@ namespace BK1696
             var m = ExtractV(resp);
             v = NumInputBox.GetVal(NumInputBox.NumInputType.VOLT, v, m);
             if (v == 0) return;
+            SetVoltageText(v);
             v *= 10;
             SendSimpleCommand("VOLT00" + v.ToString("000"));
+        }
+
+        private void SetVoltageText(decimal v)
+        {
+            setVoltageMenuItem.Text = $"Set voltage ({v:F1})";
         }
 
         private void SetCurrent(object sender, EventArgs e)
         {
             string resp = SendCommand("GETS00");
-            var v = ExtractC(resp);
+            var c = ExtractC(resp);
             resp = SendCommand("GMAX00");
             var m = ExtractC(resp);
-            v = NumInputBox.GetVal(NumInputBox.NumInputType.CURR, v, m);
-            if (v == 0) return;
-            v *= 100;
-            SendSimpleCommand("CURR00" + v.ToString("000"));
+            c = NumInputBox.GetVal(NumInputBox.NumInputType.CURR, c, m);
+            if (c == 0) return;
+            SetCurrentText(c);
+            c *= 100;
+            SendSimpleCommand("CURR00" + c.ToString("000"));
+        }
+
+        private void SetCurrentText(decimal c)
+        {
+            setCurrentMenuItem.Text = $"Set current ({c:F2})";
         }
 
         private void SetPort(object sender, EventArgs e)
