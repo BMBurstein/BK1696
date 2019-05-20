@@ -101,10 +101,13 @@ namespace BK1696
             }
 
             string resp = SendCommand("GETS00");
-            var v = ExtractV(resp);
-            var c = ExtractC(resp);
-            SetVoltageText(v);
-            SetCurrentText(c);
+            if (resp != null)
+            {
+                var v = ExtractV(resp);
+                var c = ExtractC(resp);
+                SetVoltageText(v);
+                SetCurrentText(c);
+            }
         }
 
         private void TrayApplicationContext_ThreadExit(object sender, EventArgs e)
