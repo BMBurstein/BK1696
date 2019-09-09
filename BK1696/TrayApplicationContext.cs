@@ -44,7 +44,6 @@ namespace BK1696
                 }
                 activePort = activePort ?? newPort;
             }
-            SetPort(activePort, null);
 
             ThreadExit += TrayApplicationContext_ThreadExit;
 #if DEBUG
@@ -70,7 +69,7 @@ namespace BK1696
             trayIcon.ContextMenuStrip.Items.Add("Exit", Properties.Resources.Exit, Exit_Click);
             trayIcon.MouseClick += TrayIcon_MouseClick;
 
-            UpdateState(null, null);
+            SetPort(activePort, null);
             initDone = true;
         }
 
@@ -287,6 +286,11 @@ namespace BK1696
                     it.Checked = false;
             }
             portName = item.Text;
+
+            var restore = initDone;
+            initDone = false;
+            UpdateState(null, null);
+            initDone = restore;
         }
 
         private void GetState()
